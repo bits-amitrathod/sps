@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <report
+                id="action_report_sales_saleperson_wise"
+                string="Gross Sales By Product"
+                model="sale.order.line"
+                report_type="qweb-html"
+                file="report_sale_orders_groupby_product.group_by_product"
+                name="report_sale_orders_groupby_product.group_by_product"
+        />
+    </data>
+</odoo>

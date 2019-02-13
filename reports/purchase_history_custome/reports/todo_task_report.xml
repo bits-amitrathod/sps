@@ -1,0 +1,90 @@
+<odoo>
+
+    <report id="action_todo_model_report"
+            string="Purchase History"
+            model="purchase.order"
+            report_type="qweb-html"
+            file="purchase_history_custome.purchase_report"
+            name="purchase_history_custome.purchase_report"
+    />
+
+    <template id="purchase_report">
+        <t t-call="web.html_container">
+            <t t-call="web.external_layout">
+                <page>
+                    <div class="oe_structure"/>
+                    <div class="row">
+
+                        <center>
+                            <b>
+                                <h4>Surgical Product Solutions</h4>
+                            </b>
+                            <b>
+                                <h2>Purchase History Report</h2>
+                            </b>
+                        </center>
+                        <center>
+                            <h4 t-if="date">
+                                <span t-esc="date"/>
+                            </h4>
+                        </center>
+                        <!-- Report page content -->
+
+                            <table class="table table-condensed table-bordered" style="border: 1px solid #000;">
+                                <thead>
+                                <tr>
+                                    <th style="border: 1px solid black;text-align: center;">Order Reference</th>
+                                    <th style="border: 1px solid black;text-align: left;">Product SKU</th>
+                                    <!--<th style="border: 1px solid black;text-align: center;">Manufacturer</th>-->
+                                    <th style="border: 1px solid black;text-align: center;">Vendor Name</th>
+                                    <th style="border: 1px solid black;text-align: center;">Product Name</th>
+                                    <th style="border: 1px solid black;text-align: center;">Product Qty</th>
+                                    <th style="border: 1px solid black;text-align: center;">Price Per Unit</th>
+                                    <th style="border: 1px solid black;text-align: center;">Min Expiration Date</th>
+                                    <th style="border: 1px solid black;text-align: center;">Max Expiration Date</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <!--<t t-foreach="data.keys()" t-as="user">-->
+                                    <t t-foreach="data" t-as="o">
+                                        <tr>
+                                            <td  style="border: 1px solid #000;">
+                                                <span t-esc="o.name"/>
+                                            </td>
+                                            <td  style="border: 1px solid #000;">
+                                                <span t-esc="o.sku"/>
+                                            </td>
+                                            <!--<td  style="border: 1px solid #000;">-->
+                                                <!--<span t-esc="o.manufacturer_rep"/>-->
+                                            <!--</td>-->
+                                            <td  style="border: 1px solid #000;">
+                                                <span t-esc="o.vendor"/>
+                                            </td>
+                                            <td style="border: 1px solid #000;">
+                                                <span t-esc="o.product_name"/>
+                                            </td>
+                                            <td align="right"  style="border: 1px solid #000;">
+                                                <span t-esc="o.qty"/>
+                                            </td>
+                                            <td align="center"  style="border: 1px solid #000;">
+                                                <span t-esc="o.minExpDate" t-options="{'widget':'date'}"/>
+                                            </td>
+                                            <td align="center"  style="border: 1px solid #000;">
+                                                <span t-esc="o.maxExpDate" t-options="{'widget':'date'}"/>
+                                            </td>
+                                            <td align="right"  style="border: 1px solid #000; white-space:nowrap;">
+                                                <span t-esc="o.unit_price" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                                            </td>
+                                        </tr>
+                                    </t>
+                                </tbody>
+                                <!--</t>-->
+                            </table>
+                        </div>
+
+                </page>
+            </t>
+        </t>
+    </template>
+
+</odoo>

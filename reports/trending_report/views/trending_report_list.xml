@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record model="ir.ui.view" id="trending_report_list">
+              <field name="name">purchase.vendor.view.list</field>
+              <field name="model">res.partner</field>
+               <field name="priority">21</field>
+              <field name="arch" type="xml">
+                <tree create="false" edit="false" delete="false" >
+                    <field name="name" string="Customer Name"/>
+                    <field name="month_count"/>
+                    <field name="month6" widget="monetary" />
+                    <field name="month5" widget="monetary"/>
+                    <field name="month4" widget="monetary"/>
+                    <field name="month3" widget="monetary"/>
+                    <field name="month2" widget="monetary"/>
+                    <field name="month1" widget="monetary"/>
+                    <field name="month_total"/>
+                    <field name="average_sale" widget="monetary"/>
+                    <field name="trend_val"/>
+                    <field name="total_sale" widget="monetary" sum="Total"/>
+                    <field name="currency_id"  invisible="1" />
+                </tree>
+              </field>
+        </record>
+
+
+       <record id="trending_report_list_id" model="ir.actions.act_window">
+            <field name="name">Trending Report</field>
+            <field name="res_model">res.partner</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="context">{"search_default_customer":1}</field>
+            <field name="search_view_id" ref="base.view_res_partner_filter"/>
+            <field name="priority">51</field>
+            <field name="view_id" ref="trending_report_list"/>
+       </record>
+
+
+
+        <menuitem id="menu_trending_report_list_report"
+                  name="Trending Report"
+                  action="trending_report_list_id"
+                  parent="sale.menu_sale_report"
+                  sequence="5"/>
+
+    </data>
+
+</odoo>

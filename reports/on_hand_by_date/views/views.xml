@@ -1,0 +1,92 @@
+<odoo>
+    <data>
+        <record id="view_on_hand_by_date_popup" model="ir.ui.view">
+            <field name="name">On Hand By Date</field>
+            <field name="model">popup.on_hand_by_date</field>
+            <field name="arch" type="xml">
+                <form string="Filter">
+                    <group>
+                        <group>
+                            <field name="report_date"/>
+                            <field name="vendor_id"/>
+                            <field name="sku_code"/>
+                            <field name="warehouse_id"/>
+                        </group>
+                        <group>
+                            <field name="quantities" widget="radio"/>
+                            <group>
+                                <field name="show_inactive_products" widget="checkbox"/>
+                            </group>
+                            <group>
+                                <field name="show_cost" widget="checkbox"/>
+                            </group>
+                        </group>
+                    </group>
+                    <footer>
+                        <button name="open_table" string="View Report" type="object" class="btn-primary"/>
+                        <button string="Cancel" class="btn-default" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <record id="action_on_hand_by_date" model="ir.actions.act_window">
+            <field name="name">On Hand By Date</field>
+            <field name="res_model">popup.on_hand_by_date</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="view_on_hand_by_date_popup"/>
+            <field name="target">new</field>
+            <field name="context">{'valuation': True}</field>
+        </record>
+
+
+        <record model="ir.ui.view" id="on_hand_by_date_list_view">
+            <field name="name">report.on.hand.by.date.list</field>
+            <field name="model">report.on.hand.by.date</field>
+            <field name="arch" type="xml">
+                <tree create="false" edit="false" delete="false">
+                    <field name="sku_code"/>
+                    <field name="product_name"/>
+                    <field name="qty_done"/>
+                    <field name="vendor_name"/>
+                    <field name="price_unit" widget='monetary'/>
+                    <field name="asset_value" widget='monetary'/>
+                    <field name="currency_id" invisible="1"/>
+                </tree>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="on_hand_by_datelist_view">
+            <field name="name">report.on.hand.by.date.list2</field>
+            <field name="model">report.on.hand.by.date</field>
+            <field name="arch" type="xml">
+                <tree create="false" edit="false" delete="false">
+                    <field name="sku_code"/>
+                    <field name="product_name"/>
+                    <field name="vendor_name"/>
+                    <field name="qty_done"/>
+                    <field name="currency_id" invisible="1"/>
+                </tree>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="on_hand_by_dateform_view">
+            <field name="name">report.on.hand.by.date.form</field>
+            <field name="model">report.on.hand.by.date</field>
+            <field name="arch" type="xml">
+                <form create="false" edit="false" delete="false">
+                    <group>
+                        <field name="product_name"/>
+                        <field name="sku_code"/>
+                        <field name="qty_done"/>
+                        <field name="vendor_name"/>
+                    </group>
+                </form>
+            </field>
+        </record>
+
+        <menuitem name="On Hand By Date" id="on_hand_by_date_menu" parent="stock.menu_warehouse_report"
+                  action="on_hand_by_date.action_on_hand_by_date"/>
+    </data>
+</odoo>

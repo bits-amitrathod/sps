@@ -1,0 +1,97 @@
+<odoo>
+
+    <record id="view_stock_inventory_valuation_summary" model="ir.ui.view">
+        <field name="name">report.inventory.valuation.summary.default</field>
+        <field name="model">report.inventory.valuation.summary</field>
+        <field name="arch" type="xml">
+            <search string="Product">
+                <filter string="Valuation Summary" name="valuation_summary" domain="[]"
+                        context="{'group_by' : ['warehouse', 'location', 'type']}"/>
+                <separator/>
+            </search>
+        </field>
+    </record>
+
+    <!-- LIST VIEW -->
+    <record model="ir.ui.view" id="inventory_valuation_summary_list">
+        <field name="name">inventory_valuation_summary_list</field>
+        <field name="model">report.inventory.valuation.summary</field>
+        <field name="arch" type="xml">
+            <tree create="false" edit="false" delete="false">
+                <field name="sku_code"/>
+                <field name="name" string="Product Name"/>
+                <field name="quantity_cal"/>
+                <field name="currency_id" invisible="1"/>
+                <field name="unit_cost" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                <field name="asset_value" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                <field name="cost_method" invisible="1"/>
+                <button name="action_valuation_at_date_details" type="object" icon="fa-info-circle"
+                        attrs="{'invisible': [('cost_method', '!=', 'fifo')]}"/>
+            </tree>
+        </field>
+    </record>
+
+    <record model="ir.ui.view" id="inventory_valuation_summary_form">
+        <field name="name">inventory_valuation_summary_form</field>
+        <field name="model">report.inventory.valuation.summary</field>
+        <field name="arch" type="xml">
+            <form create="false" edit="false" delete="false">
+                <sheet>
+                    <div class="oe_title">
+                        <h3>
+                            <field name="product_id"/>
+                        </h3>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="sku_code"/>
+                            <field name="name" string="Product Name"/>
+                            <field name="quantity_cal"/>
+                            <field name="currency_id" invisible="1"/>
+                            <field name="unit_cost" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                            <field name="asset_value" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="inventory_valuation_summary_popup_view" model="ir.ui.view">
+        <field name="name">Inventory Valuation Summary </field>
+        <field name="model">popup.inventory.valuation.summary</field>
+        <field name="arch" type="xml">
+            <form string="Choose your date">
+
+                <group>
+                    <group>
+                        <field name="warehouse"/>
+                        <field name="location"/>
+                    </group>
+                    <group>
+                        <field name="property_cost_method"/>
+                        <field name="sku_code"/>
+                        <field name="asset_value"/>
+                    </group>
+                </group>
+                <footer>
+                    <button name="open_table" string="View Report" type="object" class="btn-primary"/>
+                    <button string="Cancel" class="btn-default" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_stock_inventory_valuation_summary" model="ir.actions.act_window">
+        <field name="name">Inventory Valuation Summary</field>
+        <field name="res_model">popup.inventory.valuation.summary</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+
+    <menuitem id="menu_stock_inventory_valuation_summary" name="Inventory Valuation Summary"
+              parent="stock.menu_warehouse_report" sequence="110"
+              action="action_stock_inventory_valuation_summary"/>
+</odoo>

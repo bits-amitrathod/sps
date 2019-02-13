@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!--<record id="view_compate_sale_by_month_summary" model="ir.ui.view">-->
+            <!--<field name="name">compare sale by month</field>-->
+            <!--<field name="model">product.product</field>-->
+            <!--<field name="arch" type="xml">-->
+                <!--<search string="Product">-->
+                    <!--<filter string="Location" name="group_by_location" domain="[]"-->
+                            <!--context="{'group_by': 'location'}"/>-->
+                    <!--<separator/>-->
+                <!--</search>-->
+            <!--</field>-->
+        <!--</record>-->
+
+        <record id="view_popup_view" model="ir.ui.view">
+            <field name="name">Compare Sales By Month</field>
+            <field name="model">compbysale.popup</field>
+            <field name="arch" type="xml">
+                <form string="Choose your date">
+                        <group>
+                            <field name="compute_at_date" widget="radio"/>
+                        </group>
+                         <group>
+                                <group>
+                                    <field name="current_start_date" attrs="{'invisible': [('compute_at_date', '=', 0)]}"/>
+                                    <field name="last_start_date" attrs="{'invisible': [('compute_at_date', '=', 0)]}"/>
+                                </group>
+                                <group>
+                                    <field name="current_end_date" attrs="{'invisible': [('compute_at_date', '=', 0)]}"/>
+                                    <field name="last_end_date" attrs="{'invisible': [('compute_at_date', '=', 0)]}"/>
+                                </group>
+                          </group>
+
+                    <footer>
+                        <button name="open_table" string="View Report" type="object" class="btn-primary"/>
+                        <button string="Cancel" class="btn-default" special="cancel" />
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <record id="action_comp_sale_valuation" model="ir.actions.act_window">
+            <field name="name">Compare Sale By Month</field>
+            <field name="res_model">compbysale.popup</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="view_popup_view"/>
+            <field name="target">new</field>
+            <field name="context">{'default_compute_at_date': 0, 'valuation': True}</field>
+        </record>
+
+
+        <record model="ir.ui.view" id="list_view">
+              <field name="name">compare.sale.by.month.view.list</field>
+              <field name="model">product.product</field>
+              <field name="priority">20</field>
+              <field name="arch" type="xml">
+                <tree create="false" edit="false" delete="false">
+                    <field name="sku_code" string="Product SKU"/>
+                    <field name="name" string="Product Name"/>
+                    <field name="last_month_total_qty" />
+                    <field name="last_month_total_amount" widget="monetary" />
+                    <field name="current_month_total_qty" />
+                    <field name="current_month_total_amount" widget="monetary"/>
+                    <field name="currency_id"  invisible="1" />
+                    <!--<field name="location"/>-->
+                </tree>
+              </field>
+        </record>
+
+
+
+        <menuitem id="sr_menu_sale_report_salesperson_wizard"
+                  name="Compare Sales By Month"
+                  action="action_comp_sale_valuation"
+                  parent="sale.menu_sale_report"
+                  sequence="1"/>
+    </data>
+
+</odoo>

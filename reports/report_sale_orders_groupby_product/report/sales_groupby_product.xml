@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="group_by_product">
+        <t t-call="web.html_container">
+            <t t-call="web.external_layout">
+                <page>
+                    <style>
+                        .noborders {
+                        border: 0;
+                        }
+
+                        .table-bordered > tbody > tr > td,.table-bordered > tbody > tr > th {
+                        border: 1px solid #000;
+                        }
+                    </style>
+                    <div class="oe_structure"/>
+                    <div class="row">
+                        <center>
+                            <b>
+                                <h2>Surgical Product Solutions</h2>
+                                <h4>Gross Sales By Product</h4>
+                                 <h4 t-if="popup.compute_at_date">
+                                    Date Range: <span t-esc="popup.start_date" t-options='{"widget": "date"}'/>
+                                             -  <span t-esc="popup.end_date" t-options='{"widget": "date"}'/>
+                                </h4>
+                            </b>
+                        </center>
+
+                    </div>
+                    <br/>
+                    <t t-foreach="data" t-as="product">
+                        <b>
+                            <span>Product :</span>
+                            <span t-esc="product['name']"/>
+                        </b>
+
+                        <table class="table table-condensed table-bordered table-bordered">
+                            <tr>
+                                <th class="text-right" style="width:10%">#</th>
+                                <th class="text-center">Sales Order#</th>
+                                <th class="text-center">Date Order</th>
+                                <th class="text-center">Product SKU </th>
+                                <th class="text-center">Ordered Qty</th>
+                                <th class="text-center">Subtotal</th>
+                            </tr>
+                            <t t-set="index" t-value="1"/>
+                            <t t-set="totalAmount" t-value="0"/>
+
+                            <tr t-foreach="product['table']" t-as="saleOrder">
+                                <t t-set="amount" t-value="float(saleOrder[4])"/>
+
+                                <td class="text-right" t-esc="index"/>
+                                <td class="text-center" t-esc="saleOrder[0]"/>
+                                <td class="text-center" t-esc="saleOrder[1]"/>
+                                <td class="text-center" t-esc="saleOrder[2]"/>
+                                <td class="text-center" t-esc="round(float(saleOrder[3]))"/>
+                                <td class="text-right">$
+                                    <span t-esc="'{:.2f}'.format(amount)"/>
+                                </td>
+                                <t t-set="index" t-value="index+1"/>
+                                <t t-set="totalAmount" t-value="totalAmount+amount"/>
+                            </tr>
+                            <tr>
+                                <td colspan="4" class="noborders"/>
+                                <th class="text-right" scope="row">TOTAL</th>
+                                <td class="text-right">
+                                    $
+                                    <span t-esc="'{:.2f}'.format(totalAmount)"/>
+                                </td>
+                            </tr>
+                        </table>
+
+                    </t>
+                </page>
+            </t>
+        </t>
+    </template>
+</odoo>

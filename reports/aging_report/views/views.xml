@@ -1,0 +1,89 @@
+<odoo>
+    <data>
+
+        <record model="ir.ui.view" id="aging_report_tree">
+            <field name="name">aging.report.list</field>
+            <field name="model">aging.report</field>
+            <field name="priority">20</field>
+            <field name="arch" type="xml">
+                <tree create="false" edit="false" delete="false">
+                      <field name="sku_code"/>
+                      <field name="product_name"/>
+                      <field name="lot_name"/>
+                      <field name="qty"/>
+                      <field name="product_uom_id"/>
+                      <field name="create_date" string="Created Date"/>
+                      <field name="use_date" string="Expriry Date"/>
+                      <field name="days"/>
+                </tree>
+            </field>
+        </record>
+
+
+
+           <record model="ir.ui.view" id="aging_report_form">
+            <field name="name">aging.report.form</field>
+            <field name="model">aging.report</field>
+            <field name="arch" type="xml">
+                <form create="false" edit="false" delete="false">
+                    <sheet>
+                        <group>
+                            <field name="warehouse_id"/>
+                            <field name="sku_code" string="Product SKU"/>
+                            <field name="product_id"/>
+                            <field name="lot_name"/>
+                            <field name="qty"/>
+                            <field name="product_uom_id"/>
+                            <field name="create_date" string="Created Date"/>
+                            <field name="use_date" string="Expriry Date"/>
+                            <field name="days"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+
+        <!--</record>-->
+         <record id="view_stock_quantity" model="ir.ui.view">
+        <field name="name">Aging Report</field>
+        <field name="model">aging_popup.view.model</field>
+        <field name="arch" type="xml">
+            <form string="Choose your date">
+                <group>
+
+                    <group>
+                    <field name="sku_code"/>
+                    <field name="warehouse_id"/>
+                    </group>
+                    <group>
+                        <field name="location_id" />
+                    </group>
+                </group>
+                <footer>
+                    <button name="open_table" string="View Report" type="object" class="btn-primary"/>
+                    <button string="Cancel" class="btn-default" special="cancel" />
+                </footer>
+            </form>
+        </field>
+    </record>
+
+        <record id="action_stock_quantity" model="ir.actions.act_window">
+        <field name="name">Aging Report</field>
+        <field name="res_model">aging_popup.view.model</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="view_stock_quantity"/>
+        <field name="target">new</field>
+    </record>
+
+
+        <menuitem id="purchase_history_report1"
+                  action="action_stock_quantity"
+                  name="Aging Report"
+                  parent="stock.menu_warehouse_report"
+                  sequence="4"/>
+
+
+    </data>
+</odoo>

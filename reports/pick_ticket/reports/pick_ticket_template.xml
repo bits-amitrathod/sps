@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="pick_ticket_report1">
+        <t t-call="web.html_container">
+            <t t-call="web.external_layout">
+                <page>
+                    <div class="oe_structure"/>
+                    <div class="row">
+                        <center>
+                            <b>
+                                <h2>Surgical Product Solution</h2>
+                                <h4>Pick Ticket
+                                    <span t-if="popup.compute_at_date">- By Date</span>
+                                    <span t-else="">- By Order</span>
+                                </h4>
+                                <h4 t-if="popup.compute_at_date">
+                                    <span t-esc="popup.start_date" t-options='{"widget": "date"}'/>
+                                    to
+                                    <span t-esc="popup.end_date" t-options='{"widget": "date"}'/>
+                                </h4>
+                            </b>
+                        </center>
+                        <br/>
+                    </div>
+                    <t t-foreach="picks" t-as="pick_int">
+                        <t t-set="pick" t-value="picks[pick_int]"/>
+
+                        <table class="table table-condensed" style="margin-bottom: 0px;">
+                            <tr>
+                                <td style="border: none;">
+                                    <strong>Pick Number:</strong>
+                                    <span t-esc="pick['picking']"/>
+                                </td>
+                                <td style="border: none;">
+                                    <strong>Sales Order#:</strong>
+                                    <span t-esc="pick['order']"/>
+                                </td>
+                                <td style="border: none;">
+                                    <strong>Carrier:</strong>
+                                    <span t-esc="pick['carrier']"/>
+                                </td>
+                                <td style="border: none;">
+                                    <strong>Warehouse:</strong>
+                                    <span t-esc="pick['warehouse']"/>
+                                </td>
+                                <td style="border: none;">
+                                    <strong>Priority:</strong>
+                                    <span t-esc="pick['priority']"/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="border: none;">
+                                    <strong>Scheduled Date:</strong>
+                                    <span t-esc="pick['scheduled_date']" t-options='{"widget": "date"}'/>
+                                </td>
+                                <td style="border: none;">
+                                    <strong>Customer Name:</strong>
+                                    <span t-esc="pick['customer']"/>
+                                </td>
+                                <td style="border: none;">
+                                    <strong>Status:</strong>
+                                    <span t-esc="pick['state']"/>
+                                </td>
+                                <td style="border: none;">
+                                    <strong>Operation Type:</strong>
+                                    <span t-esc="pick['picking_type']"/>
+                                </td>
+                            </tr>
+                        </table>
+                        <table class="table table-condensed" style="border: 1px solid black;">
+                            <thead>
+                                <tr>
+                                    <th style="border: 1px solid black;text-align:  center !important;">
+                                        Product Name
+                                    </th>
+                                    <th style="border: 1px solid black;text-align:  center !important;">
+                                        Quantity
+                                    </th>
+                                    <th style="border: 1px solid black;text-align:  center !important;">
+                                        UOM
+                                    </th>
+                                    <th style="border: 1px solid black;text-align:  center !important;">
+                                        Location
+                                    </th>
+                                    <th style="border: 1px solid black;text-align:  center !important;">
+                                        Destination
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr t-foreach="pick['product']" t-as="product">
+                                    <td style="border: 1px solid black;">
+                                        <span t-esc="product['product']"/>
+                                    </td>
+                                    <td style="border: 1px solid black;" align="center">
+                                        <span t-esc="product['quantity']"/>
+                                    </td>
+                                    <td style="border: 1px solid black;">
+                                        <span t-esc="product['product_uom']"/>
+                                    </td>
+                                    <td style="border: 1px solid black;">
+                                        <span t-esc="product['location']"/>
+                                    </td>
+                                    <td style="border: 1px solid black;">
+                                        <span t-esc="product['destination']"/>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </t>
+                </page>
+            </t>
+        </t>
+    </template>
+
+
+</odoo>

@@ -1,0 +1,86 @@
+<odoo>
+
+    <report id="action_todo_model_report"
+            string="Lot History"
+            model="lot.history.report"
+            report_type="qweb-html"
+            file="lot_history.purchase_report"
+            name="lot_history.purchase_report"
+    />
+
+    <template id="purchase_report">
+        <t t-call="web.html_container">
+            <t t-call="web.external_layout">
+                <page>
+                    <div class="oe_structure"/>
+                    <div class="row">
+
+                        <center>
+                            <b>
+                                <h4>Surgical Product Solutions</h4>
+                            </b>
+                            <b>
+                                <h2>Lot History</h2>
+                            </b>
+                        </center>
+                        <!-- Report page content -->
+                            <table class="table table-condensed table-bordered" style="border: 1px solid black;">
+                                <thead>
+                                <tr>
+                                    <th style="border: 1px solid black;text-align: left;">Product SKU</th>
+                                    <th style="border: 1px solid black;text-align: left;">Product Name</th>
+                                    <th style="border: 1px solid black;text-align: left;">Type</th>
+                                    <th style="border: 1px solid black;text-align: left;">Event</th>
+                                    <th style="border: 1px solid black;text-align: left;">Event Date</th>
+                                    <th style="border: 1px solid black;text-align: left;">Change</th>
+                                    <th style="border: 1px solid black;text-align: left;">Lot #</th>
+                                    <th style="border: 1px solid black;text-align: left;">Vendor Name</th>
+                                    <th style="border: 1px solid black;text-align: right;">Phone</th>
+                                    <th style="border: 1px solid black;text-align: left;">Email</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                    <t t-foreach="data" t-as="lot">
+                                        <tr>
+                                            <td style="border: 1px solid black;">
+                                                <span t-esc="lot.sku_code"/>
+                                            </td>
+                                            <td style="border: 1px solid black;">
+                                                <span t-esc="lot.description"/>
+                                            </td>
+                                            <td style="border: 1px solid black;">
+                                                <span t-esc="lot.type"/>
+                                            </td>
+                                            <td style="border: 1px solid black;">
+                                                <span t-esc="lot.event"/>
+                                            </td>
+                                            <td style="border: 1px solid black;">
+                                                <span t-esc="lot.event_date" t-options="{'widget':'date'}"/>
+                                            </td>
+                                            <td style="border: 1px solid black;">
+                                                <span t-esc="lot.change"/>
+                                            </td>
+                                            <td style="border: 1px solid black;">
+                                                <span t-esc="lot.lot_no"/>
+                                            </td>
+                                            <td style="border: 1px solid black;">
+                                                <span t-esc="lot.vendor"/>
+                                            </td>
+                                            <td style="border: 1px solid black;">
+                                                <span t-esc="lot.phone"/>
+                                            </td>
+                                            <td style="border: 1px solid black;">
+                                                <span t-esc="lot.email"/>
+                                            </td>
+                                        </tr>
+                                    </t>
+                                </tbody>
+                            </table>
+                        </div>
+
+                </page>
+            </t>
+        </t>
+    </template>
+
+</odoo>
