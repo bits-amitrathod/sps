@@ -33,7 +33,10 @@ class Customer(models.Model):
     having_carrier = fields.Boolean("Having Carrier?")
     notification_email = fields.Char("Notification Email")
     saleforce_ac = fields.Char("SF A/C No#")
-    sale_margine = fields.Char("Sales Level")
+    sale_margine = fields.Selection([
+        ('shared', 'Shared'),
+        ('gifted', 'Gifted'),
+        ('legacy', 'Legacy')], string='Sales Level')
     preferred_method = fields.Selection([
         ('mail', 'Mail'),
         ('email', 'E Mail'),
@@ -198,10 +201,16 @@ class Customer(models.Model):
 
 class ProductTemplate(models.Model):
     _inherit = 'product.template'
+
+    def _get_default_uom_id(self):
+        return self.env["product.uom"].search([], limit=1, order='id').id
+
     location = fields.Char("Location")
     premium = fields.Boolean("Premium")
     sku_code = fields.Char('SKU / Catalog No')
     manufacturer_pref = fields.Char(string='Manuf. Catalog No')
+    manufacturer_uom = fields.Many2one('product.uom', 'Manufacturer Unit of Measure', default=_get_default_uom_id,
+                                       required=True)
 
 
 class NotificationSetting(models.Model):
