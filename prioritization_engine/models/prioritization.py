@@ -16,7 +16,7 @@ class Customer(models.Model):
     prioritization_ids = fields.One2many('prioritization_engine.prioritization', 'customer_id')
     min_threshold = fields.Integer("Product Min Threshold", readonly=False)
     max_threshold = fields.Integer("Product Max Threshold", readonly=False)
-    priority = fields.Integer("Product Priority", default=-1, readonly=False, help="if Product Priority is -1 then Prioritization Engine will process only those products which are added in 'Customer Priority Configuration'.")
+    priority = fields.Integer("Product Priority", default=-1, readonly=False, help="If Product Priority is -1 then Prioritization Engine will process only those products which are added in 'Customer Priority Configuration'.")
     cooling_period = fields.Integer("Cooling Period in days", readonly=False)
     auto_allocate = fields.Boolean("Allow Auto Allocation?", readonly=False)
     length_of_hold = fields.Integer("Length Of Hold in hours", readonly=False, default=1)
@@ -90,7 +90,10 @@ class Customer(models.Model):
                                 'length_of_hold': ml.length_of_hold,
                                 'expiration_tolerance': ml.expiration_tolerance,
                                 'cooling_period': ml.cooling_period,
-                                'max_threshold': ml.max_threshold});
+                                'max_threshold': ml.max_threshold,
+                                'is_share': ml.is_share,
+                                'sale_margine': ml.sale_margine
+                                });
 
     def action_view_notification(self):
         '''
