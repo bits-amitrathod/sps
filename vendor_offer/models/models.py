@@ -56,13 +56,14 @@ class VendorOffer(models.Model):
 
     possible_competition = fields.Many2one('competition.competition', string="Possible Competition")
     max = fields.Char(string='Max', compute='_amount_all', default=0, readonly=True)
-    potential_profit_margin = fields.Char(string='Potential Profit Margin', compute='_amount_all', default=0,
-                                          readonly=True)
+    potential_profit_margin = fields.Char(string='Potential Profit Margin', compute='_amount_all', default=0)
     rt_price_subtotal_amt = fields.Monetary(string='Subtotal', compute='_amount_all', readonly=True)
     rt_price_total_amt = fields.Monetary(string='Total', compute='_amount_all', readonly=True)
     rt_price_tax_amt = fields.Monetary(string='Tax', compute='_amount_all', readonly=True)
     # val_temp = fields.Char(string='Temp', default=0)
     temp_payment_term = fields.Char(string='Temp')
+    offer_type_pdf_text = fields.Char(string='offer type Temp')
+    credit_offer_type_pdf_text = fields.Char(string='credit offer type Temp')
 
     '''show_validate = fields.Boolean(
         compute='_compute_show_validate',
@@ -273,6 +274,12 @@ class VendorOffer(models.Model):
         self.temp_payment_term = self.payment_term_id.name
         if (self.payment_term_id.name == False):
             self.temp_payment_term = '0 Days '
+        if (self.offer_type is False) or (self.offer_type == 'cash'):
+            self.offer_type_pdf_text = 'Cash Back'
+            self.credit_offer_type_pdf_text = ''
+        elif self.offer_type == 'credit':
+            self.offer_type_pdf_text = 'Credit to Purchase'
+            self.credit_offer_type_pdf_text = 'Credit Offer is valid for 12 months from the date of issue'
         self.write({'status': 'ven_sent', 'state': 'ven_sent'})
         return self.env.ref('vendor_offer.action_report_vendor_offer').report_action(self)
 
@@ -437,9 +444,9 @@ class VendorOfferProduct(models.Model):
     vendor_offer_data = fields.Boolean(related='order_id.vendor_offer_data')
     product_note = fields.Text(string="Notes")
 
-    margin = fields.Char(string="Margin", readonly=True, compute='cal_offer_price')
-    product_unit_price = fields.Monetary(string="Retail Price", readonly=True, compute='cal_offer_price', store=True)
-    product_offer_price = fields.Monetary(string="Offer Price", readonly=True, compute='cal_offer_price')
+    margin = fields.Char(string="Cost %", readonly=True, compute='_cal_offer_price')
+    product_unit_price = fields.Monetary(string="Retail Price", readonly=True, compute='_cal_offer_price', store=True)
+    # product_offer_price = fields.Monetary(string="Offer Price", readonly=True, compute='cal_offer_price')
 
     product_retail = fields.Monetary(string="Total Retail Price", compute='_compute_amount')
     rt_price_total = fields.Monetary(compute='_compute_amount', string='Total')
@@ -554,7 +561,7 @@ class VendorOfferProduct(models.Model):
 
     @api.onchange('multiplier', 'order_id.possible_competition')
     @api.depends('multiplier', 'order_id.possible_competition')
-    def cal_offer_price(self):
+    def _cal_offer_price(self):
         for line in self:
             multiplier_list = line.multiplier
             # Added to fix inhirit issue
@@ -573,8 +580,26 @@ class VendorOfferProduct(models.Model):
             line.update({
                 'margin': margin,
                 'product_unit_price': product_unit_price,
+                # 'product_offer_price': product_offer_price
+            })
+
+    @api.onchange('multiplier', 'order_id.possible_competition')
+    @api.depends('multiplier', 'order_id.possible_competition')
+    def _set_offer_price(self):
+        for line in self:
+            multiplier_list = line.multiplier
+            # Added to fix inhirit issue
+
+            product_unit_price = math.ceil(
+                round(float(line.product_id.list_price) * (float(multiplier_list.retail) / 100), 2))
+            product_offer_price = round(float(product_unit_price) * (
+                    float(multiplier_list.margin) / 100 + float(line.possible_competition.margin) / 100))
+
+            line.update({
                 'product_offer_price': product_offer_price
             })
+
+    product_offer_price = fields.Monetary(string="Offer Price", default=_set_offer_price, store=True)
 
     def update_product_expiration_date(self):
         for order in self:
@@ -904,3 +929,94 @@ class StockPicking(models.Model):
         msg = _("Shipment sent to carrier %s for shipping with tracking number %s<br/>Cost: %.2f %s") % (
             self.carrier_id.name, self.carrier_tracking_ref, self.carrier_price, order_currency.name)
         self.message_post(body=msg)
+
+
+class VendorPricingList(models.Model):
+    _inherit = 'product.product'
+
+    product_sales_count = fields.Integer(string="SALES COUNT", readonly=True,
+                                         compute='onchange_product_id_vendor_offer_pricing', store=False)
+    product_sales_count_month = fields.Integer(string="Sales Count Month", readonly=True,
+                                               compute='onchange_product_id_vendor_offer_pricing', store=False)
+    product_sales_count_90 = fields.Integer(string="SALES COUNT 90", readonly=True,
+                                            compute='onchange_product_id_vendor_offer_pricing', store=False)
+    product_sales_count_yrs = fields.Integer(string="SALES COUNT YR", readonly=True,
+                                             compute='onchange_product_id_vendor_offer_pricing', store=False)
+    qty_in_stock = fields.Integer(string="QTY IN STOCK", readonly=True, compute='onchange_product_id_vendor_offer_pricing',
+                                  store=False)
+    expired_inventory = fields.Char(string="EXP INVENTORY", compute='onchange_product_id_vendor_offer_pricing',
+                                    readonly=True,
+                                    store=False)
+    tier_name = fields.Char(string="TIER", readonly=True,
+                                  compute='onchange_product_id_vendor_offer_pricing',
+                                  store=False)
+    amount_total_ven_pri = fields.Monetary(string='SALES TOTAL', compute='onchange_product_id_vendor_offer_pricing', readonly=True , store=False)
+
+    def onchange_product_id_vendor_offer_pricing(self):
+        for line in self:
+            line.product_tier = line.product_tmpl_id.tier
+            result1 = {}
+            if not line.id:
+                return result1
+
+            groupby_dict = groupby_dict_month = groupby_dict_90 = groupby_dict_yr = {}
+            sale_orders_line = line.env['sale.order.line'].search(
+                [('product_id', '=', line.id), ('state', '=', 'sale')])
+            groupby_dict['data'] = sale_orders_line
+            total = total_m = total_90 = total_yr = 0
+            amount_total_sale = 0
+
+            for sale_order in groupby_dict['data']:
+                total = total + sale_order.product_uom_qty
+                amount_total_sale = amount_total_sale+sale_order.price_total
+
+            amount_total_ven_pri = amount_total_sale
+
+            line.product_sales_count = total
+            sale_orders = line.env['sale.order'].search(
+                [('product_id', '=', line.id), ('state', '=', 'sale')])
+
+            filtered_by_date = list(
+                filter(lambda x: fields.Datetime.from_string(x.confirmation_date).date() >= (
+                        fields.date.today() - datetime.timedelta(days=30)), sale_orders))
+            groupby_dict_month['data'] = filtered_by_date
+            for sale_order_list in groupby_dict_month['data']:
+                for sale_order in sale_order_list.order_line:
+                    if sale_order.product_id.id == line.id:
+                        total_m = total_m + sale_order.product_uom_qty
+
+            line.product_sales_count_month = total_m
+
+            filtered_by_90 = list(filter(lambda x: fields.Datetime.from_string(x.confirmation_date).date() >= (
+                    fields.date.today() - datetime.timedelta(days=90)), sale_orders))
+            groupby_dict_90['data'] = filtered_by_90
+
+            for sale_order_list_90 in groupby_dict_90['data']:
+                for sale_order in sale_order_list_90.order_line:
+                    if sale_order.product_id.id == line.id:
+                        total_90 = total_90 + sale_order.product_uom_qty
+
+            line.product_sales_count_90 = total_90
+
+            filtered_by_yr = list(filter(lambda x: fields.Datetime.from_string(x.confirmation_date).date() >= (
+                    fields.date.today() - datetime.timedelta(days=365)), sale_orders))
+            groupby_dict_yr['data'] = filtered_by_yr
+            for sale_order_list_yr in groupby_dict_yr['data']:
+                for sale_order in sale_order_list_yr.order_line:
+                    if sale_order.product_id.id == line.id:
+                        total_yr = total_yr + sale_order.product_uom_qty
+
+            line.product_sales_count_yrs = total_yr
+            self.expired_inventory_cal(line)
+            line.qty_in_stock = line.qty_available
+            line.tier_name = line.tier.name
+
+    def expired_inventory_cal(self, line):
+        expired_lot_count = 0
+        test_id_list = self.env['stock.production.lot'].search([('product_id', '=', line.id)])
+        for prod_lot in test_id_list:
+            if prod_lot.use_date:
+                if fields.Datetime.from_string(prod_lot.use_date).date() < fields.date.today():
+                    expired_lot_count = expired_lot_count + 1
+
+        line.expired_inventory = expired_lot_count
