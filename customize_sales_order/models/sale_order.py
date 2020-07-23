@@ -22,6 +22,7 @@ class CustomerContract(models.Model):
                                            domain="[('active', '=', True), ('share','=',False)]")
 
 
+
 class sale_order(models.Model):
     _inherit = 'sale.order'
 
