@@ -2,7 +2,7 @@
 {
     'name': "Revenue By Key Account Report",
 
-     'summary': """Report""",
+     'summary': """ Report""",
 
     # 'description': """
     #     Long description of module's purpose
